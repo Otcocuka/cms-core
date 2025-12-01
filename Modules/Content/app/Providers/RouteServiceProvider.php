@@ -17,16 +17,19 @@ class RouteServiceProvider extends ServiceProvider
     public function boot(): void
     {
         parent::boot();
+
+        // (теперь это делается через бутстрап\апп.пхп) Явно вызываем регистрацию роутов
+        // $this->map();
     }
 
     /**
      * Define the routes for the application.
      */
-    public function map(): void
-    {
-        $this->mapApiRoutes();
-        $this->mapWebRoutes();
-    }
+    // public function map(): void
+    // {
+    //     $this->mapApiRoutes();
+    //     $this->mapWebRoutes();
+    // }
 
     /**
      * Define the "web" routes for the application.
@@ -35,7 +38,8 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapWebRoutes(): void
     {
-        Route::middleware('web')->group(module_path($this->name, '/routes/web.php'));
+        Route::middleware('web')  // ← Важно!
+            ->group(module_path($this->name, '/routes/web.php'));
     }
 
     /**
@@ -45,6 +49,9 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapApiRoutes(): void
     {
-        Route::middleware('api')->prefix('api')->name('api.')->group(module_path($this->name, '/routes/api.php'));
+        Route::middleware('api')
+            ->prefix('api')
+            ->name('api.')
+            ->group(module_path($this->name, '/routes/api.php'));
     }
 }
