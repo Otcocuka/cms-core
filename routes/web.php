@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use Modules\Content\Http\Livewire\PageShow;
 
 Route::get('/', function () {
     return view('welcome');
@@ -18,3 +19,9 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__ . '/auth.php';
+
+// ========================================================
+// ДИНАМИЧЕСКИЙ РОУТ для страниц (ДОЛЖЕН БЫТЬ В САМОМ КОНЦЕ!)
+// ========================================================
+// Стало (временно для теста):
+Route::get('/{slug}', PageShow::class)->name('page.show');

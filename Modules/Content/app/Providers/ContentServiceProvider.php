@@ -8,6 +8,8 @@ use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Livewire\Livewire; // ← ADD
+use Modules\Content\Http\Livewire\PageShow;
+
 
 // Добавьте импорты компонентов
 use Modules\Content\Http\Livewire\PageIndex; // ← ADD
@@ -169,6 +171,7 @@ class ContentServiceProvider extends ServiceProvider
         if (class_exists(Livewire::class)) {
             Livewire::component('content::page-index', PageIndex::class);
             Livewire::component('content::page-form', PageForm::class);
+            Livewire::component('content::page-show', PageShow::class);
         }
     }
 }
