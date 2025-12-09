@@ -7,6 +7,11 @@ use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Modules\Settings\Services\SettingsManager; // <<== Добавлено
+
+
+use Livewire\Livewire;
+use Modules\Settings\Http\Livewire\Admin\SettingsTable;
 
 class SettingsServiceProvider extends ServiceProvider
 {
@@ -27,6 +32,9 @@ class SettingsServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+
+        // 🔥 Регистрация Livewire компонентов модуля
+        $this->registerLivewireComponents(); // <<< ДОБАВЛЯЕМ
     }
 
     /**
@@ -36,6 +44,9 @@ class SettingsServiceProvider extends ServiceProvider
     {
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
+
+        // 🔥 Зарегистрируем наш сервис
+        $this->app->singleton(SettingsManager::class);
     }
 
     /**
@@ -62,7 +73,7 @@ class SettingsServiceProvider extends ServiceProvider
      */
     public function registerTranslations(): void
     {
-        $langPath = resource_path('lang/modules/'.$this->nameLower);
+        $langPath = resource_path('lang/modules/' . $this->nameLower);
 
         if (is_dir($langPath)) {
             $this->loadTranslationsFrom($langPath, $this->nameLower);
@@ -85,9 +96,9 @@ class SettingsServiceProvider extends ServiceProvider
 
             foreach ($iterator as $file) {
                 if ($file->isFile() && $file->getExtension() === 'php') {
-                    $config = str_replace($configPath.DIRECTORY_SEPARATOR, '', $file->getPathname());
+                    $config = str_replace($configPath . DIRECTORY_SEPARATOR, '', $file->getPathname());
                     $config_key = str_replace([DIRECTORY_SEPARATOR, '.php'], ['.', ''], $config);
-                    $segments = explode('.', $this->nameLower.'.'.$config_key);
+                    $segments = explode('.', $this->nameLower . '.' . $config_key);
 
                     // Remove duplicated adjacent segments
                     $normalized = [];
@@ -122,14 +133,14 @@ class SettingsServiceProvider extends ServiceProvider
      */
     public function registerViews(): void
     {
-        $viewPath = resource_path('views/modules/'.$this->nameLower);
+        $viewPath = resource_path('views/modules/' . $this->nameLower);
         $sourcePath = module_path($this->name, 'resources/views');
 
-        $this->publishes([$sourcePath => $viewPath], ['views', $this->nameLower.'-module-views']);
+        $this->publishes([$sourcePath => $viewPath], ['views', $this->nameLower . '-module-views']);
 
         $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->nameLower);
 
-        Blade::componentNamespace(config('modules.namespace').'\\' . $this->name . '\\View\\Components', $this->nameLower);
+        Blade::componentNamespace(config('modules.namespace') . '\\' . $this->name . '\\View\\Components', $this->nameLower);
     }
 
     /**
@@ -137,18 +148,31 @@ class SettingsServiceProvider extends ServiceProvider
      */
     public function provides(): array
     {
-        return [];
+        return [
+            SettingsManager::class,
+        ];
     }
 
     private function getPublishableViewPaths(): array
     {
         $paths = [];
         foreach (config('view.paths') as $path) {
-            if (is_dir($path.'/modules/'.$this->nameLower)) {
-                $paths[] = $path.'/modules/'.$this->nameLower;
+            if (is_dir($path . '/modules/' . $this->nameLower)) {
+                $paths[] = $path . '/modules/' . $this->nameLower;
             }
         }
 
         return $paths;
+    }
+
+
+    /**
+     * Регистрация Livewire компонентов модуля
+     */
+    protected function registerLivewireComponents(): void
+    {
+        if (class_exists(Livewire::class)) {
+            Livewire::component('settings::settings-table', SettingsTable::class);
+        }
     }
 }

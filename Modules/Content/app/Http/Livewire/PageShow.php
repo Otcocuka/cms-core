@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Modules\Content\Models\Page;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Log;
 
 #[Layout('layouts.frontend')]
 class PageShow extends Component
@@ -22,16 +23,16 @@ class PageShow extends Component
 
     public function mount($slug)
     {
-        \Log::info('PageShow mount called', ['slug' => $slug]);
+        Log::info('PageShow mount called', ['slug' => $slug]);
 
         try {
             $this->page = Page::where('slug', $slug)
                 ->published()
                 ->firstOrFail();
 
-            \Log::info('Page found', ['id' => $this->page->id, 'title' => $this->page->title]);
+            Log::info('Page found', ['id' => $this->page->id, 'title' => $this->page->title]);
         } catch (\Exception $e) {
-            \Log::error('Page not found', ['slug' => $slug, 'error' => $e->getMessage()]);
+            Log::error('Page not found', ['slug' => $slug, 'error' => $e->getMessage()]);
             throw $e;
         }
 

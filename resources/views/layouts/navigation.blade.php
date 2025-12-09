@@ -20,6 +20,12 @@
                     <x-nav-link :href="route('content.pages.index')" :active="request()->routeIs('content.pages.*')">
                         {{ __('Pages') }}
                     </x-nav-link>
+
+                    {{-- Settings UI link --}}
+                    {{-- NEW --}}
+                    <x-responsive-nav-link :href="route('admin.settings.ui')" :active="request()->routeIs('admin.settings.ui')">
+                        {{ __('Settings') }}
+                        </x-nav-link>
                 </div>
             </div>
 
@@ -87,6 +93,11 @@
             {{-- Pages link --}}
             <x-responsive-nav-link :href="route('content.pages.index')" :active="request()->routeIs('content.pages.*')">
                 {{ __('Pages') }}
+            </x-responsive-nav-link>
+
+            {{-- Settings UI link --}}
+            <x-responsive-nav-link :href="route('admin.settings.ui')" :active="request()->routeIs('admin.settings.ui')">
+                {{ __('Settings') }}
             </x-responsive-nav-link>
         </div>
 
