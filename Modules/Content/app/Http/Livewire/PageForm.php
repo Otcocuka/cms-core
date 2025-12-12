@@ -4,12 +4,16 @@ namespace Modules\Content\Http\Livewire;
 
 use Livewire\Component;
 use Livewire\Attributes\Layout;
+use Livewire\WithFileUploads;
 use Modules\Content\Models\Page;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 #[Layout('layouts.app')]
 class PageForm extends Component
 {
+    use WithFileUploads;
+
     public ?Page $page = null;
     public $title = '';
     public $slug = '';
@@ -18,6 +22,10 @@ class PageForm extends Component
     public $status = 'draft';
     public $published_at = '';
     public $isEditing = false;
+
+    // Featured Image
+    public $featuredImage;
+    public $existingImage;
 
     protected function rules()
     {
@@ -30,6 +38,7 @@ class PageForm extends Component
             'excerpt' => 'nullable|string|max:500',
             'status' => 'required|in:draft,published,archived',
             'published_at' => 'nullable|date',
+            'featuredImage' => 'nullable|image|max:2048', // <<< NEW
         ];
     }
 
@@ -44,6 +53,9 @@ class PageForm extends Component
             $this->excerpt = $page->excerpt ?? '';
             $this->status = $page->status;
             $this->published_at = $page->published_at?->format('Y-m-d\TH:i') ?? '';
+
+            // Загружаем существующую обложку
+            $this->existingImage = $page->meta['featured_image'] ?? null;
         }
     }
 
@@ -89,24 +101,42 @@ class PageForm extends Component
     {
         $this->validate();
 
-        $data = [
-            'title' => $this->title,
-            'slug' => $this->slug,
-            'content' => $this->content,
-            'excerpt' => $this->excerpt,
-            'status' => $this->status,
-            'published_at' => $this->published_at ?: null,
-        ];
+        try {
+            $data = [
+                'title' => $this->title,
+                'slug' => $this->slug,
+                'content' => $this->content,
+                'excerpt' => $this->excerpt,
+                'status' => $this->status,
+                'published_at' => $this->published_at ?: null,
+            ];
 
-        if ($this->isEditing) {
-            $this->page->update($data);
-            session()->flash('message', 'Page updated successfully.');
-        } else {
-            Page::create($data);
-            session()->flash('message', 'Page created successfully.');
+            // Обработка обложки
+            if ($this->featuredImage) {
+                $path = $this->featuredImage->store('pages', 'public');
+                $data['meta'] = array_merge($this->page?->meta ?? [], [
+                    'featured_image' => $path
+                ]);
+            } elseif ($this->existingImage) {
+                $data['meta'] = array_merge($this->page?->meta ?? [], [
+                    'featured_image' => $this->existingImage
+                ]);
+            }
+
+            if ($this->isEditing) {
+                $this->page->update($data);
+                session()->flash('message', 'Page updated successfully.');
+            } else {
+                Page::create($data);
+                session()->flash('message', 'Page created successfully.');
+            }
+
+            return redirect()->route('content.pages.index');
+
+        } catch (\Exception $e) {
+            Log::error('Page save error: ' . $e->getMessage());
+            session()->flash('error', 'Failed to save page.');
         }
-
-        return redirect()->route('content.pages.index');
     }
 
     public function render()
