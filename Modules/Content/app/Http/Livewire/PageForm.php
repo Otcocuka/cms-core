@@ -111,15 +111,20 @@ class PageForm extends Component
                 'published_at' => $this->published_at ?: null,
             ];
 
-            // Обработка обложки
+            // ЛОГИКА ИЗОБРАЖЕНИЯ
             if ($this->featuredImage) {
+                Log::info('Featured image uploaded: ' . $this->featuredImage->getClientOriginalName());
                 $path = $this->featuredImage->store('pages', 'public');
+                Log::info('Stored at: ' . $path);
+
+                // Записываем в meta
                 $data['meta'] = array_merge($this->page?->meta ?? [], [
-                    'featured_image' => $path
+                    'featured_image' => $path,
                 ]);
             } elseif ($this->existingImage) {
+                // Сохраняем старую, если новая не загружена
                 $data['meta'] = array_merge($this->page?->meta ?? [], [
-                    'featured_image' => $this->existingImage
+                    'featured_image' => $this->existingImage,
                 ]);
             }
 
