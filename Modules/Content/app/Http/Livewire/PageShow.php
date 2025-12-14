@@ -7,8 +7,9 @@ use Livewire\Attributes\Layout;
 use Modules\Content\Models\Page;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-#[Layout('layouts.frontend')]
+#[Layout('content::components.layouts.master')]
 class PageShow extends Component
 {
     public Page $page;
@@ -21,22 +22,17 @@ class PageShow extends Component
     public $ogDescription;
     public $ogImage;
 
-    public function mount($slug)
+    public function mount($slug): void
     {
-        Log::info('PageShow mount called', ['slug' => $slug]);
-
         try {
             $this->page = Page::where('slug', $slug)
-                ->published()
+                ->where('status', 'published')
                 ->firstOrFail();
 
-            Log::info('Page found', ['id' => $this->page->id, 'title' => $this->page->title]);
-        } catch (\Exception $e) {
-            Log::error('Page not found', ['slug' => $slug, 'error' => $e->getMessage()]);
-            throw $e;
+            $this->setupSeoData();
+        } catch (ModelNotFoundException $e) {
+            abort(404);
         }
-
-        $this->setupSeoData();
     }
 
     protected function setupSeoData(): void
@@ -44,22 +40,21 @@ class PageShow extends Component
         $this->metaTitle = $this->page->meta_title ?? $this->page->title;
         $this->metaDescription = $this->page->meta_description ?? $this->page->excerpt;
         $this->metaKeywords = $this->page->meta_keywords ?? '';
-        $this->ogTitle = $this->page->og_title ?? $this->page->meta_title ?? $this->page->title;
-        $this->ogDescription = $this->page->og_description ?? $this->page->meta_description ?? $this->page->excerpt;
-        $this->ogImage = $this->page->og_image ?? $this->page->featured_image ?? '';
+        $this->ogTitle = $this->page->og_title ?? $this->metaTitle;
+        $this->ogDescription = $this->page->og_description ?? $this->metaDescription;
+        $this->ogImage = asset('storage/' . ($this->page->meta['featured_image'] ?? ''));
     }
 
     public function render()
     {
         // Передаём SEO данные в layout
         View::share([
-            'metaTitle' => $this->metaTitle,
-            'metaDescription' => $this->metaDescription,
-            'metaKeywords' => $this->metaKeywords,
+            'title' => $this->metaTitle,
+            'description' => $this->metaDescription,
+            'keywords' => $this->metaKeywords,
             'ogTitle' => $this->ogTitle,
             'ogDescription' => $this->ogDescription,
             'ogImage' => $this->ogImage,
-            'title' => $this->page->title,
         ]);
 
         return view('content::livewire.page-show');

@@ -29,7 +29,7 @@
                 @endif
 
                 <!-- Form -->
-                <form wire:submit="save" class="space-y-6">
+                <form wire:submit.prevent="save" class="space-y-6">
                     <!-- Title -->
                     <div>
                         <label for="title" class="block text-sm font-medium text-gray-700">
@@ -139,7 +139,7 @@
 
                         <!-- Поле загрузки -->
                         <div class="mt-2">
-                            <input type="file" wire:model="featuredImage" accept="image/*"
+                            <input type="file" wire:model.live="featuredImage" accept="image/*"
                                 class="block w-full text-sm text-gray-500
                       file:mr-4 file:py-2 file:px-4
                       file:rounded file:border-0

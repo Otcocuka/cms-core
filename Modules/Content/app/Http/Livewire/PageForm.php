@@ -38,7 +38,7 @@ class PageForm extends Component
             'excerpt' => 'nullable|string|max:500',
             'status' => 'required|in:draft,published,archived',
             'published_at' => 'nullable|date',
-            'featuredImage' => 'nullable|image|max:2048', // <<< NEW
+            'featuredImage' => 'nullable|image|max:2048',
         ];
     }
 
@@ -57,16 +57,24 @@ class PageForm extends Component
             // Загружаем существующую обложку
             $this->existingImage = $page->meta['featured_image'] ?? null;
         }
+
+        Log::info('Mounted PageForm', [
+            'isEditing' => $this->isEditing,
+            'pageId' => $page?->id,
+            'meta' => $page?->meta ?? null,
+            'existingImage' => $this->existingImage,
+        ]);
     }
 
     public function updated($propertyName)
     {
-        $this->validateOnly($propertyName);
+        if ($propertyName !== 'featuredImage') {
+            $this->validateOnly($propertyName);
+        }
     }
 
     public function updatedTitle($value)
     {
-        // Автогенерация slug только при создании новой страницы
         if (!$this->isEditing || empty($this->slug)) {
             $this->slug = Str::slug($value);
         }
@@ -81,7 +89,6 @@ class PageForm extends Component
 
         $this->slug = Str::slug($this->title);
 
-        // Проверка уникальности и добавление счётчика если нужно
         $originalSlug = $this->slug;
         $counter = 1;
 
@@ -99,6 +106,8 @@ class PageForm extends Component
 
     public function save()
     {
+        Log::info('save() called');
+        Log::info('featuredImage before validation: ' . ($this->featuredImage ? 'YES' : 'NO'));
         $this->validate();
 
         try {
@@ -111,22 +120,19 @@ class PageForm extends Component
                 'published_at' => $this->published_at ?: null,
             ];
 
-            // ЛОГИКА ИЗОБРАЖЕНИЯ
+            // === META HANDLING ===
+            $meta = $this->page?->meta ?? [];
+
             if ($this->featuredImage) {
                 Log::info('Featured image uploaded: ' . $this->featuredImage->getClientOriginalName());
                 $path = $this->featuredImage->store('pages', 'public');
                 Log::info('Stored at: ' . $path);
-
-                // Записываем в meta
-                $data['meta'] = array_merge($this->page?->meta ?? [], [
-                    'featured_image' => $path,
-                ]);
+                $meta['featured_image'] = $path;
             } elseif ($this->existingImage) {
-                // Сохраняем старую, если новая не загружена
-                $data['meta'] = array_merge($this->page?->meta ?? [], [
-                    'featured_image' => $this->existingImage,
-                ]);
+                $meta['featured_image'] = $this->existingImage;
             }
+
+            $data['meta'] = $meta;
 
             if ($this->isEditing) {
                 $this->page->update($data);
@@ -142,6 +148,12 @@ class PageForm extends Component
             Log::error('Page save error: ' . $e->getMessage());
             session()->flash('error', 'Failed to save page.');
         }
+    }
+
+    public function updatedFeaturedImage()
+    {
+        Log::info('updatedFeaturedImage called');
+        Log::info('Uploaded file: ' . ($this->featuredImage?->getClientOriginalName() ?? 'null'));
     }
 
     public function render()

@@ -22,6 +22,7 @@ class Page extends Model
         'excerpt',
         'status',
         'published_at',
+        'meta', // <<< ОБЯЗАТЕЛЬНО
         // SEO (пока без миграции)
         'meta_title',
         'meta_description',
@@ -34,6 +35,7 @@ class Page extends Model
 
     protected $casts = [
         'published_at' => 'datetime',
+        'meta' => 'array', // <<< НУЖНО ЭТО
     ];
 
     protected static function boot()
