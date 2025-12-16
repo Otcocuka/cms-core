@@ -7,6 +7,11 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+Crazy new commit- repurposing this whole gig
+in the beginning I just wanted some nice ai-powered cms on laravel to ship to my friends who have small/medium-size businesses with a goal to make my product enterprise-level
+now we change the course of action- this is gonna become an ai-powered platform for online casinos
+
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
