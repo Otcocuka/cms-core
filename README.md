@@ -12,6 +12,11 @@ in the beginning I just wanted some nice ai-powered cms on laravel to ship to my
 now we change the course of action- this is gonna become an ai-powered platform for online casinos
 
 
+UPD 17.12:
+technology reconnaissance / architecture due diligence
+
+
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
