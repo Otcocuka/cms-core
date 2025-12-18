@@ -4,53 +4,64 @@ namespace Modules\Media\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Modules\Media\Models\Media;
 
 class MediaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        return view('media::index');
+        $media = Media::paginate(10);
+        return view('media::index', compact('media'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return view('media::create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request) {}
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    public function store(Request $request)
     {
-        return view('media::show');
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'file_name' => 'required|string',
+            'disk' => 'required|string',
+            'size' => 'required|integer',
+        ]);
+
+        // Убираем поля model_type и model_id, они будут автоматически заполнены при использовании morphs
+        $data = $request->only(['name', 'file_name', 'disk', 'size']);
+
+        $media = Media::create($data);
+
+        return redirect()->route('admin.media.index')
+            ->with('success', 'Media created successfully');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
+    public function edit(Media $media)
     {
-        return view('media::edit');
+        return view('media::edit', compact('media'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id) {}
+    public function update(Request $request, Media $media)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'file_name' => 'required|string',
+            'disk' => 'required|string',
+            'size' => 'required|integer',
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
+        $media->update($request->only(['name', 'file_name', 'disk', 'size']));
+
+        return redirect()->route('admin.media.index')
+            ->with('success', 'Media updated successfully');
+    }
+
+    public function destroy(Media $media)
+    {
+        $media->delete();
+
+        return redirect()->route('admin.media.index')
+            ->with('success', 'Media deleted successfully');
+    }
 }

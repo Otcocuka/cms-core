@@ -35,7 +35,7 @@ class EventServiceProvider extends ServiceProvider
     protected function discoverEventsWithin(): array
     {
         return [
-            $this->app->path('Listeners'),
+            app_path('Listeners'),
         ];
     }
 }
