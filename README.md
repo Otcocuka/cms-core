@@ -16,7 +16,8 @@ UPD 17.12:
 technology reconnaissance / architecture due diligence
 UPD 19.12:
 researching once again- got multiple project at once, trying to close all the gaps with this cms-core
-
+UPD 20.12:
+new research for clients- seems like a successful one 
 
 ## About Laravel
 
