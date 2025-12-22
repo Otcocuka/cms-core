@@ -20,7 +20,12 @@ UPD 20.12:
 new research for clients- seems like a successful one 
 UPD 21.12:
 interviewing the clients about the required business logic
+UPD 22.12:
+killer-feature will be in a week
+
+
 ## About Laravel
+
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
