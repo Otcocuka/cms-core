@@ -22,7 +22,8 @@ UPD 21.12:
 interviewing the clients about the required business logic
 UPD 22.12:
 killer-feature will be in a week
-
+upd 24.12:
+pre-christmas special
 
 ## About Laravel
 
