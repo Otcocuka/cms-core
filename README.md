@@ -25,7 +25,7 @@ killer-feature will be in a week
 upd 24.12:
 pre-christmas special
 
-
+new updates:
 
 upd 12.01:
 -make a working build for Sasha Ta4kokup with pages generation from telegram posts
